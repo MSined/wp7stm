@@ -42,7 +42,7 @@ namespace TransitMTL
 
         private void Search_Click(object sender, RoutedEventArgs e)
         {
-            string template = "http://www2.stm.info/horaires/frmResult.aspx?Langue=Fr&Arret=";
+            string template = "http://www2.stm.info/horaires/frmResult.aspx?Langue=En&Arret=";
             template += StopCodeTextBox.Text;
             HtmlWeb.LoadAsync(template, SiteLoaded);
         }
@@ -59,22 +59,103 @@ namespace TransitMTL
                     temp = n.ChildNodes;
                 }
             }
-
-            List<String> holder = new List<String>();
+            List<BusStopData> busStopData = new List<BusStopData>();
 
             for (int i = 1; i < temp.Count - 1; i++)
             {
-                string busLine = "Stop: " + temp[i].ChildNodes[2].ChildNodes[0].InnerHtml + " Direction: " + temp[i].ChildNodes[3].ChildNodes[0].InnerHtml + " Times: ";
+                String stopNum = temp[i].ChildNodes[2].ChildNodes[0].InnerHtml;
+                String direction = temp[i].ChildNodes[3].ChildNodes[0].InnerHtml;
+                List<String> times = new List<String>();
+
                 for (int j = 4; j < temp[i].ChildNodes.Count - 1; j++)
                 {
-                    busLine += temp[i].ChildNodes[j].InnerHtml + ", ";
+                    times.Add(temp[i].ChildNodes[j].InnerHtml);
                 }
-                holder.Add(busLine);
+
+                BusStopData busStop = new BusStopData(stopNum, direction, times);
+                busStopData.Add(busStop);
+            }
+
+            ResultsList.Items.Clear();
+
+            for (int i = 0; i < busStopData.Count; i++)
+            {
+                
+                Grid stopContainer = new Grid();
+
+                TextBlock busNum = new TextBlock();
+                busNum.Text = busStopData[i].getStopNumber();
+                busNum.Height = 70;
+                busNum.HorizontalAlignment = HorizontalAlignment.Left;
+                busNum.VerticalAlignment = VerticalAlignment.Top;
+                busNum.FontSize = 48;
+                busNum.Margin = new Thickness(13, 0, 0, 0);
+
+                TextBlock busDirection = new TextBlock();
+                busDirection.Text = busStopData[i].getDirection();
+                busDirection.Height = 30;
+                busDirection.HorizontalAlignment = HorizontalAlignment.Left;
+                busDirection.VerticalAlignment = VerticalAlignment.Top;
+                busDirection.Margin = new Thickness(100,20,0,0);
+
+                TextBlock busTimeslabel = new TextBlock();
+                busTimeslabel.Text = "Next passing times";
+                busTimeslabel.Height = 30;
+                busTimeslabel.HorizontalAlignment = HorizontalAlignment.Left;
+                busTimeslabel.VerticalAlignment = VerticalAlignment.Top;
+                busTimeslabel.Margin = new Thickness(12, 50, 0, 0);
+
+                TextBlock busTimes = new TextBlock();
+                for (int k = 0; k < busStopData[i].getTimes().Count; k++)
+                {
+                    string convertedTime;
+                    string[] time = busStopData[i].getTimes()[k].Split('h');
+
+                    if (Convert.ToInt32(time[0]) > 11)
+                    {
+                        if (Convert.ToInt32(time[0]) == 12)
+                        {
+                            convertedTime = String.Join(":", time.ToList()) + " PM";
+                        }
+                        else
+                        {
+                            time[0] = (Convert.ToInt32(time[0]) - 12) + "";
+                            convertedTime = String.Join(":", time.ToList()) + " PM";
+                        }
+                    }
+                    else
+                    {
+                        if (Convert.ToInt32(time[0]) == 0)
+                            time[0] = "12";
+                        convertedTime = String.Join(":", time.ToList()) + " AM";
+                    }
+                    if (k < busStopData[i].getTimes().Count - 1)
+                    {
+                        busTimes.Text += convertedTime + ", ";
+                    }
+                    else
+                    {
+                        busTimes.Text += convertedTime + "";
+                    }
+                }
+                busTimes.HorizontalAlignment = HorizontalAlignment.Left;
+                busTimes.VerticalAlignment = VerticalAlignment.Top;
+                busTimes.TextWrapping = TextWrapping.Wrap;
+                busTimes.Margin = new Thickness(12,80,0,0);
+
+                stopContainer.Children.Add(busNum);
+                stopContainer.Children.Add(busDirection);
+                stopContainer.Children.Add(busTimeslabel);
+                stopContainer.Children.Add(busTimes);
+                ResultsList.Items.Add(stopContainer);
             }
 
             //foreach (String s in holder)
             //{
+            //    TextBlock txBlock = new TextBlock();
+            //    txBlock.Text = s;
             //    System.Diagnostics.Debug.WriteLine(s);
+            //    StopCodeGrid.Children.Add(txBlock);
             //}
             //System.Diagnostics.Debug.WriteLine(temp[1].ChildNodes.Count);
 
@@ -88,8 +169,17 @@ namespace TransitMTL
             //                                                .Select(x => x.InnerText)
             //                                                .ToList());
 
-            Results.Text = String.Join(Environment.NewLine, holder.ToList());
+            
+
+            
+
+            //Results.Text = String.Join(Environment.NewLine, holder.ToList());
             //System.Diagnostics.Debug.WriteLine(node);
+        }
+
+        private void ResultsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ResultsList.SelectedItem = null;
         }
     }
 }
