@@ -25,21 +25,6 @@
             </controls:Panorama.Background>
  
             <!--Panorama item one-->
-            <controls:PanoramaItem Header="Bus Stop Code">
-                <!--Double line list with text wrapping-->
-                <ListBox Margin="0,0,-12,0" ItemsSource="{Binding Items}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,0,0,17" Width="432" Height="78">
-                                <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
-                                <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Margin="12,-6,12,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </controls:PanoramaItem>
- 
-            <!--Panorama item two-->
             <!--Use 'Orientation="Horizontal"' to enable a panel that lays out horizontally-->
             <controls:PanoramaItem Header="Bus">
                 <!--Double line list with image placeholder and text wrapping-->
@@ -49,16 +34,28 @@
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,17">
                                 <!--Replace rectangle with image-->
                                 <!--<Rectangle Height="100" Canvas.Top="0"  Width="100" Fill="#FFE5001b" Margin="12,0,9,0"/>-->
-                                <TextBlock Height="30" Margin="12,0,9,0" Name="textBlock1" Text="TextBlock" />
-                                <StackPanel Width="311">                                    
-                                    <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
-                                    <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Margin="12,-6,12,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
+                                <TextBlock Height="50" Margin="12,0,9,0" Text="{Binding LineOne}" Style="{StaticResource PhoneTextSubtleStyle}" FontSize="32" />
+                                <StackPanel Width="311">
+                                    <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Style="{StaticResource PhoneTextLargeStyle}"/>
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
             </controls:PanoramaItem>
+
+            <!--Panorama item two-->
+            <controls:PanoramaItem Header="Stop Code">
+                <!--Double line list with text wrapping-->
+                <Grid>
+                <TextBox Height="72" HorizontalAlignment="Left" Name="StopCodeTextBox" Text="Enter Bus Code Here" VerticalAlignment="Top" Width="450" GotFocus="StopCodeTextBox_OnFocus" />
+                <Button Content="Search" Height="72" HorizontalAlignment="Left" Name="Search" VerticalAlignment="Top" Width="160" Click="Search_Click" Margin="0,60,0,0" />
+                    
+                        <TextBlock Height="30" HorizontalAlignment="Left" x:Name="Results" Text="" VerticalAlignment="Top" Margin="10,131,0,0">afafasdasd</TextBlock>
+                   
+                </Grid>
+            </controls:PanoramaItem>
         </controls:Panorama>
+        
     </Grid>
 </phone:PhoneApplicationPage>
