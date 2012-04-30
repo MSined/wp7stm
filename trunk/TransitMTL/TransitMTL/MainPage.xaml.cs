@@ -291,7 +291,7 @@ namespace TransitMTL
         {
             string temp = MyDataSaver.LoadMyData(saveFileName);
 
-            System.Diagnostics.Debug.WriteLine("Favorites: " + temp);
+            //System.Diagnostics.Debug.WriteLine("Favorites: " + temp);
             if (temp != null)
             {
                 favorites = temp;
@@ -361,9 +361,9 @@ namespace TransitMTL
 
             for (int i = 1; i < temp.Count - 1; i++)
             {
-                System.Diagnostics.Debug.WriteLine("Favorites: " + favFile);
-                System.Diagnostics.Debug.WriteLine("Search: " + temp[i].ChildNodes[2].ChildNodes[0].InnerHtml + "|" + stopNumArray[0]);
-                System.Diagnostics.Debug.WriteLine(favFile.Contains(temp[i].ChildNodes[2].ChildNodes[0].InnerHtml + "|" + stopNumArray[0]));
+                //System.Diagnostics.Debug.WriteLine("Favorites: " + favFile);
+                //System.Diagnostics.Debug.WriteLine("Search: " + temp[i].ChildNodes[2].ChildNodes[0].InnerHtml + "|" + stopNumArray[0]);
+                //System.Diagnostics.Debug.WriteLine(favFile.Contains(temp[i].ChildNodes[2].ChildNodes[0].InnerHtml + "|" + stopNumArray[0]));
 
                 if (favFile.Contains(temp[i].ChildNodes[2].ChildNodes[0].InnerHtml + "|" + stopNumArray[0]))
                 {
@@ -374,7 +374,10 @@ namespace TransitMTL
                     for (int j = 4; j < temp[i].ChildNodes.Count - 1; j++)
                     {
                         if (temp[i].ChildNodes[j].InnerHtml != "&nbsp;")
-                            times.Add(temp[i].ChildNodes[j].InnerHtml);
+                            if (!temp[i].ChildNodes[j].InnerHtml.Contains("href"))
+                                times.Add(temp[i].ChildNodes[j].InnerHtml);
+                            else
+                                times.Add(temp[i].ChildNodes[j].ChildNodes[0].InnerHtml);
                     }
 
                     BusStopData busStop = new BusStopData(busNum, stopNumArray[0], direction, times);
