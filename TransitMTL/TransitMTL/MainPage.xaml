@@ -7,6 +7,7 @@
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800" 
     d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
@@ -19,7 +20,7 @@
     <Grid x:Name="LayoutRoot" Background="Transparent">
  
         <!--Panorama control-->
-        <controls:Panorama Title="Transit MTL">
+        <controls:Panorama Title="Transit MTL" Name="PanoramaLayout" TitleTemplate="{StaticResource SmallerPanoramaTitle}">
             <controls:Panorama.Background>
                 <ImageBrush ImageSource="PanoramaBackground.png"/>
             </controls:Panorama.Background>
@@ -47,14 +48,15 @@
             <controls:PanoramaItem Header="Stop Code">
                 <!--Double line list with text wrapping-->
                 <Grid Name="StopCodeGrid">
-                    <TextBox Height="72" HorizontalAlignment="Left" Name="StopCodeTextBox" Text="Enter Bus Code Here" VerticalAlignment="Top" Width="450" GotFocus="StopCodeTextBox_OnFocus" InputScope="Digits"></TextBox>
+                    <TextBox Height="72" HorizontalAlignment="Left" Name="StopCodeTextBox" Text="Enter Bus Code Here" VerticalAlignment="Top" GotFocus="StopCodeTextBox_OnFocus" InputScope="Digits" Width="400"></TextBox>
                     <Button Content="Search" Height="72" HorizontalAlignment="Left" Name="Search" VerticalAlignment="Top" Width="160" Click="Search_Click" Margin="0,60,0,0" />
-                    <ListBox Height="367" Margin="0,131,0,0" Name="ResultsList" SelectionChanged="ResultsList_SelectionChanged">
+                    <ListBox Height="462" Margin="0,129,0,0" Name="ResultsList" SelectionChanged="ResultsList_SelectionChanged">
                         <!--<Grid Name="ResultsListItem" >
-                            <TextBlock Height="70" HorizontalAlignment="Left" Margin="13,0,0,0" Name="textBlock1" Text="128" VerticalAlignment="Top" Width="73" FontWeight="Normal" FontSize="48" />
+                            <TextBlock Height="70" HorizontalAlignment="Left" Margin="13,0,0,0" Name="textBlock17" Text="128" VerticalAlignment="Top" Width="73" FontWeight="Normal" FontSize="48" />
                             <TextBlock Height="30" HorizontalAlignment="Left" Margin="100,20,0,0" Name="textBlock3" Text="South" VerticalAlignment="Top" />
                             <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,50,0,0" Name="textBlock2" Text="Next Passing:" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" />
                             <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,80,0,0" Name="textBlock4" Text="12h00" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" />
+                            <TextBlock Height="30" HorizontalAlignment="Left" Margin="200,20,0,0" Name="textBlock9" Text="12h00" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" />
                         </Grid>-->
                     </ListBox>
                 </Grid>
@@ -63,13 +65,10 @@
             <controls:PanoramaItem Header="Favorites">
                 <!--Double line list with text wrapping-->
                 <Grid Name="FavoritesGrid">
-                    <ListBox Height="367" Margin="0,131,0,0" Name="FavoritesList" SelectionChanged="ResultsList_SelectionChanged">
-                        <!--<Grid Name="ResultsListItem" >
-                            <TextBlock Height="70" HorizontalAlignment="Left" Margin="13,0,0,0" Name="textBlock1" Text="128" VerticalAlignment="Top" Width="73" FontWeight="Normal" FontSize="48" />
-                            <TextBlock Height="30" HorizontalAlignment="Left" Margin="100,20,0,0" Name="textBlock3" Text="South" VerticalAlignment="Top" />
-                            <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,50,0,0" Name="textBlock2" Text="Next Passing:" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" />
-                            <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,80,0,0" Name="textBlock4" Text="12h00" VerticalAlignment="Top" FontWeight="Bold" FontSize="24" />
-                        </Grid>-->
+                    <ListBox Name="FavoritesList" SelectionChanged="FavoritesList_SelectionChanged">
+                        <TextBlock HorizontalAlignment="Left" Name="textBlock1" VerticalAlignment="Top" TextWrapping="Wrap">
+                            To add a stop to favorites enter the Bus Stop Code of your choice in the "Stop Code" Section and Long Press (Press and Hold) a bus line to save to Favorites. Long Press a favorite to remove it.
+                        </TextBlock>
                     </ListBox>
                 </Grid>
             </controls:PanoramaItem>
