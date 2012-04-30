@@ -104,7 +104,10 @@ namespace TransitMTL
                 for (int j = 4; j < temp[i].ChildNodes.Count - 1; j++)
                 {
                     if (temp[i].ChildNodes[j].InnerHtml != "&nbsp;")
-                        times.Add(temp[i].ChildNodes[j].InnerHtml);
+                        if (!temp[i].ChildNodes[j].InnerHtml.Contains("href"))
+                            times.Add(temp[i].ChildNodes[j].InnerHtml);
+                        else
+                            times.Add(temp[i].ChildNodes[j].ChildNodes[0].InnerHtml);
                 }
 
                 BusStopData busStop = new BusStopData(busNum, stopNumArray[0], direction, times);
@@ -230,11 +233,11 @@ namespace TransitMTL
                         FavoritesList.Items.Add(textBlock1);
                         LoadFavorites();
 
-                        MessageBox.Show("Bus Stop " + StopCodeTextBox.Text + ", Bus line " + menuItem[1] + " has been saved to favorites.", "Favorite Added", MessageBoxButton.OK);
+                        MessageBox.Show("Bus Stop " + StopCodeTextBox.Text + ", Bus line " + menuItem[0] + " has been saved to favorites.", "Favorite Added", MessageBoxButton.OK);
                     }
                     else
                     {
-                        MessageBox.Show("Bus Stop " + StopCodeTextBox.Text + ", Bus line " + menuItem[1] + " is already in Favorites.", "Favorite not Added", MessageBoxButton.OK);
+                        MessageBox.Show("Bus Stop " + StopCodeTextBox.Text + ", Bus line " + menuItem[0] + " is already in Favorites.", "Favorite not Added", MessageBoxButton.OK);
                     }
                 }
                 else
@@ -245,7 +248,7 @@ namespace TransitMTL
                     FavoritesList.Items.Add(textBlock1);
                     LoadFavorites();
 
-                    MessageBox.Show("Bus Stop " + StopCodeTextBox.Text + ", Bus line " + menuItem[1] + " has been saved to favorites.", "Favorite Added", MessageBoxButton.OK);
+                    MessageBox.Show("Bus Stop " + StopCodeTextBox.Text + ", Bus line " + menuItem[0] + " has been saved to favorites.", "Favorite Added", MessageBoxButton.OK);
                 }
             }
 
@@ -257,7 +260,7 @@ namespace TransitMTL
                 FavoritesList.Items.Add(textBlock1);
                 LoadFavorites();
 
-                MessageBox.Show("Bus Stop " + StopCodeTextBox.Text + ", Bus line " + menuItem[1] + " has been saved to favorites.", "Favorite Added", MessageBoxButton.OK);
+                MessageBox.Show("Bus Stop " + StopCodeTextBox.Text + ", Bus line " + menuItem[0] + " has been saved to favorites.", "Favorite Added", MessageBoxButton.OK);
             }
         }
 
@@ -288,15 +291,38 @@ namespace TransitMTL
         {
             string temp = MyDataSaver.LoadMyData(saveFileName);
 
+            System.Diagnostics.Debug.WriteLine("Favorites: " + temp);
             if (temp != null)
             {
                 favorites = temp;
 
                 string[] favsArray = favorites.Split(';');
 
-                foreach (string s in favsArray)
+                if (favsArray != null && favsArray.Length > 1)
                 {
-                    string[] busStopNum = s.Split('|');
+                    List<string> uniqueBusStops = new List<string>();
+                    foreach (string s in favsArray)
+                    {
+                        string[] busStopNum = s.Split('|');
+                        if (!uniqueBusStops.Contains(busStopNum[1]))
+                        {
+                            uniqueBusStops.Add(busStopNum[1]);
+                        }
+                    }
+                    foreach (string s in uniqueBusStops)
+                    {
+                        string template = "http://www2.stm.info/horaires/frmResult.aspx?Langue=En&Arret=";
+                        template += s;
+                        HtmlWeb.LoadAsync(template, FavoritesLoaded);
+                    }
+                }
+                else if (temp == "")
+                {
+
+                }
+                else
+                {
+                    string[] busStopNum = temp.Split('|');
 
                     string template = "http://www2.stm.info/horaires/frmResult.aspx?Langue=En&Arret=";
                     template += busStopNum[1];
