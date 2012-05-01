@@ -14,7 +14,7 @@
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="False">
+    shell:SystemTray.IsVisible="False" xmlns:my="clr-namespace:Microsoft.Advertising.Mobile.UI;assembly=Microsoft.Advertising.Mobile.UI">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
@@ -28,19 +28,23 @@
             <!--Panorama item one-->
             <!--Use 'Orientation="Horizontal"' to enable a panel that lays out horizontally-->
             <controls:PanoramaItem Header="Bus">
+                <ListBox HorizontalAlignment="Left" Margin="0,0,0,0" Name="BusListBox" VerticalAlignment="Top">
                 <!--Double line list with image placeholder and text wrapping-->
-                <ListBox Margin="0,0,-12,0" ItemsSource="{Binding Items}">
+                <!--<ListBox Margin="0,0,-12,0" ItemsSource="{Binding Items}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,17">
-                                <!--Replace rectangle with image-->
                                 <TextBlock Height="50" Margin="12,0,9,0" Text="{Binding LineOne}" Style="{StaticResource PhoneTextSubtleStyle}" FontSize="32" />
                                 <StackPanel Width="311">
                                     <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Style="{StaticResource PhoneTextLargeStyle}"/>
                                 </StackPanel>
                             </StackPanel>
                         </DataTemplate>
-                    </ListBox.ItemTemplate>
+                    </ListBox.ItemTemplate>-->
+                    <!--<Grid Name="BusListGrid" >
+                        <TextBlock Height="70" HorizontalAlignment="Left" Margin="13,0,0,0" Name="textBlock17" Text="128" VerticalAlignment="Top" Width="73" FontWeight="Normal" FontSize="48" Style="{StaticResource PhoneTextSubtleStyle}"/>
+                        <TextBlock HorizontalAlignment="Left" Margin="100,10,0,0" Name="textBlock3" Text="South" VerticalAlignment="Top" Style="{StaticResource PhoneTextLargeStyle}"/>
+                    </Grid>-->
                 </ListBox>
             </controls:PanoramaItem>
 
@@ -73,6 +77,6 @@
                 </Grid>
             </controls:PanoramaItem>
         </controls:Panorama>
-        
+        <!--<my:AdControl AdUnitId="Image480_80" ApplicationId="test_client" Height="50" HorizontalAlignment="Left" Margin="0,750,0,0" Name="adControl1" VerticalAlignment="Top" Width="480" />-->
     </Grid>
 </phone:PhoneApplicationPage>
