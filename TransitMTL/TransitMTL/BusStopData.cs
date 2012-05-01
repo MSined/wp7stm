@@ -17,6 +17,7 @@ namespace TransitMTL
         String busNumber;
         String stopNumber;
         String direction;
+        String busName;
         List<String> times;
 
         public BusStopData(String busNumber, String stopNumber, String direction, List<String> times)
@@ -25,6 +26,15 @@ namespace TransitMTL
             this.stopNumber = stopNumber;
             this.direction = direction;
             this.times = times;
+        }
+
+        public BusStopData(String busNumber, String stopNumber, String direction, List<String> times, String busName)
+        {
+            this.busNumber = busNumber;
+            this.stopNumber = stopNumber;
+            this.direction = direction;
+            this.times = times;
+            this.busName = busName;
         }
 
         public String getBusNumber()

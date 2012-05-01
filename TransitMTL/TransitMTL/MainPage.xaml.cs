@@ -22,6 +22,11 @@ namespace TransitMTL
         string saveFileName = "Favorites";
         string favorites;
 
+        List<Bus> localNetwork = new List<Bus>();
+        List<Bus> allNightNetwork = new List<Bus>();
+        List<Bus> expressNetwork = new List<Bus>();
+        List<Bus> shuttleNetwork = new List<Bus>();
+
         // Constructor
         public MainPage()
         {
@@ -50,7 +55,8 @@ namespace TransitMTL
             if (!App.ViewModel.IsDataLoaded)
             {
                 App.ViewModel.LoadData();
-
+                
+                LoadBusLines();
                 LoadFavorites();
             }
         }
@@ -65,10 +71,10 @@ namespace TransitMTL
         {
             string template = "http://www2.stm.info/horaires/frmResult.aspx?Langue=En&Arret=";
             template += StopCodeTextBox.Text;
-            HtmlWeb.LoadAsync(template, SiteLoaded);
+            HtmlWeb.LoadAsync(template, SearchLoaded);
         }
 
-        private void SiteLoaded(object sender, HtmlDocumentLoadCompleted args)
+        private void SearchLoaded(object sender, HtmlDocumentLoadCompleted args)
         {
             var nodes = args.Document.DocumentNode.SelectNodes("//table");
 
@@ -484,6 +490,438 @@ namespace TransitMTL
 
         private void LoadBusLines()
         {
+            string local = "http://www.stm.info/english/bus/a-lig_local.htm";
+            HtmlWeb.LoadAsync(local, LocalLinesLoaded);
+        }
+
+        private void LocalLinesLoaded(object sender, HtmlDocumentLoadCompleted args)
+        {
+            var nodes = args.Document.DocumentNode.SelectNodes("//table");
+
+            HtmlNodeCollection busTable = new HtmlNodeCollection(null);
+            busTable = nodes[1].ChildNodes;
+
+
+            System.Diagnostics.Debug.WriteLine("Local: " + String.Join(Environment.NewLine, nodes[1].ChildNodes.Count));
+
+            
+            List<string> busNumbers = new List<string>();
+            List<string> busNames = new List<string>();
+
+            for (int i = 0; i < busTable.Count; i++)
+            {
+                for (int j = 0; j < busTable[i].ChildNodes.Count; j++)
+                {
+                    if (busTable[i].ChildNodes[j].HasAttributes)
+                    {
+
+                        if (busTable[i].ChildNodes[j].GetAttributeValue("class", "Test") == "style20" || busTable[i].ChildNodes[j].GetAttributeValue("class", "Test") == "style23")
+                        {
+                            if (busTable[i].ChildNodes[j].ChildNodes.Count == 1)
+                            {
+                                busNumbers.Add(busTable[i].ChildNodes[j].InnerHtml.Replace("\r", "").Replace("\n", "").Trim());
+                                //System.Diagnostics.Debug.WriteLine(busTable[i].ChildNodes[j].InnerHtml);
+                            }
+                        }
+                        else if (busTable[i].ChildNodes[j].GetAttributeValue("style", "Test") == "width: 296px")
+                        {
+                            if (busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml.Replace("&nbsp;", "").Trim() != "Route Name")
+                                busNames.Add(busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml.Replace("&nbsp;", "").Replace("&eacute;", "é")
+                                                                                                                    .Replace("&Eacute;", "É")
+                                                                                                                    .Replace("&egrave;", "è")
+                                                                                                                    .Replace("&Egrave;", "È")
+                                                                                                                    .Replace("&ocirc;", "ô")
+                                                                                                                    .Replace("&Ocirc;", "Ô")
+                                                                                                                    .Replace("&aacute;", "á")
+                                                                                                                    .Replace("&Aacute;", "Á")
+                                                                                                                    .Replace("&agrave;", "à")
+                                                                                                                    .Replace("&Agrave;", "À")
+                                                                                                                    .Replace("&acirc;", "â")
+                                                                                                                    .Replace("&Acirc;", "Â")
+                                                                                                                    .Replace("&ccedil;", "ç")
+                                                                                                                    .Replace("&ccedil;", "Ç").Trim());
+                            //System.Diagnostics.Debug.WriteLine((busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml).Replace("&nbsp;", "").Trim());
+                        }
+                    }
+                }
+            }
+
+            if (busNumbers.Count == busNames.Count)
+            {
+                for (int i = 0; i < busNumbers.Count; i++)
+                {
+                    localNetwork.Add(new Bus(busNumbers[i], busNames[i]));
+                }
+            }
+            //foreach (Bus b in localNetwork)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("Bus Number: " + b.getBusNumber() + ", Bus Name: " + b.getBusName());
+            //}
+
+            string allNight = "http://www.stm.info/english/bus/a-lig_nuit.htm";
+            HtmlWeb.LoadAsync(allNight, AllNightLinesLoaded);
+
+            //DisplayBusData();
+
+                    //System.Diagnostics.Debug.WriteLine("i: " + i + " j: " + j + " Has Attribute: " + busTable[i].ChildNodes[j].HasAttributes + " InnerHTML: " + busTable[i].InnerHtml);
+                    //.GetAttributeValue("style", false)
+            //System.Diagnostics.Debug.WriteLine(String.Join(Environment.NewLine, nodes[1].ChildNodes[16].ChildNodes
+            //                                                .Select(x => x.InnerHtml)
+            //                                                .ToList()));
+        }
+
+        private void AllNightLinesLoaded(object sender, HtmlDocumentLoadCompleted args)
+        {
+            var nodes = args.Document.DocumentNode.SelectNodes("//table");
+
+            HtmlNodeCollection busTable = new HtmlNodeCollection(null);
+            busTable = nodes[1].ChildNodes;
+
+
+            System.Diagnostics.Debug.WriteLine("All Night: " + String.Join(Environment.NewLine, nodes[1].ChildNodes.Count));
+
+
+            List<string> busNumbers = new List<string>();
+            List<string> busNames = new List<string>();
+
+            for (int i = 0; i < busTable.Count; i++)
+            {
+                for (int j = 0; j < busTable[i].ChildNodes.Count; j++)
+                {
+                    if (busTable[i].ChildNodes[j].HasAttributes)
+                    {
+
+                        if (busTable[i].ChildNodes[j].GetAttributeValue("class", "Test") == "style7")
+                        {
+                            if (busTable[i].ChildNodes[j].ChildNodes.Count == 1)
+                            {
+                                busNumbers.Add(busTable[i].ChildNodes[j].InnerHtml.Replace("\r", "").Replace("\n", "").Trim());
+                                //System.Diagnostics.Debug.WriteLine(busTable[i].ChildNodes[j].InnerHtml);
+                            }
+                        }
+                        else if (busTable[i].ChildNodes[j].GetAttributeValue("style", "Test") == "width: 396px")
+                        {
+                            if (busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml.Replace("&nbsp;", "").Trim() != "Route Name")
+                                busNames.Add(busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml.Replace("&nbsp;", "").Replace("&eacute;", "é")
+                                                                                                                    .Replace("&Eacute;", "É")
+                                                                                                                    .Replace("&egrave;", "è")
+                                                                                                                    .Replace("&Egrave;", "È")
+                                                                                                                    .Replace("&ocirc;", "ô")
+                                                                                                                    .Replace("&Ocirc;", "Ô")
+                                                                                                                    .Replace("&aacute;", "á")
+                                                                                                                    .Replace("&Aacute;", "Á")
+                                                                                                                    .Replace("&agrave;", "à")
+                                                                                                                    .Replace("&Agrave;", "À")
+                                                                                                                    .Replace("&acirc;", "â")
+                                                                                                                    .Replace("&Acirc;", "Â")
+                                                                                                                    .Replace("&ccedil;", "ç")
+                                                                                                                    .Replace("&ccedil;", "Ç").Replace("<strong></strong>", "").Trim());
+                            //System.Diagnostics.Debug.WriteLine((busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml).Replace("&nbsp;", "").Trim());
+                        }
+                    }
+                }
+            }
+
+            if (busNumbers.Count == busNames.Count)
+            {
+                for (int i = 0; i < busNumbers.Count; i++)
+                {
+                    allNightNetwork.Add(new Bus(busNumbers[i], busNames[i]));
+                }
+            }
+            //foreach (Bus b in allNightNetwork)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("Bus Number: " + b.getBusNumber() + ", Bus Name: " + b.getBusName());
+            //}
+
+            string express = "http://www.stm.info/english/bus/a-lig_express.htm";
+            HtmlWeb.LoadAsync(express, ExpressLinesLoaded);
+
+            //DisplayBusData();
+
+            //System.Diagnostics.Debug.WriteLine("i: " + i + " j: " + j + " Has Attribute: " + busTable[i].ChildNodes[j].HasAttributes + " InnerHTML: " + busTable[i].InnerHtml);
+            //.GetAttributeValue("style", false)
+            //System.Diagnostics.Debug.WriteLine(String.Join(Environment.NewLine, nodes[1].ChildNodes[16].ChildNodes
+            //                                                .Select(x => x.InnerHtml)
+            //                                                .ToList()));
+        }
+
+        private void ExpressLinesLoaded(object sender, HtmlDocumentLoadCompleted args)
+        {
+            var nodes = args.Document.DocumentNode.SelectNodes("//table");
+
+            HtmlNodeCollection busTable = new HtmlNodeCollection(null);
+            busTable = nodes[1].ChildNodes;
+
+
+            System.Diagnostics.Debug.WriteLine("Express: " + String.Join(Environment.NewLine, nodes[1].ChildNodes.Count));
+
+
+            List<string> busNumbers = new List<string>();
+            List<string> busNames = new List<string>();
+
+            for (int i = 0; i < busTable.Count; i++)
+            {
+                for (int j = 0; j < busTable[i].ChildNodes.Count; j++)
+                {
+                    if (busTable[i].ChildNodes[j].HasAttributes)
+                    {
+
+                        if (busTable[i].ChildNodes[j].GetAttributeValue("class", "Test") == "style46")
+                        {
+                            if ((busTable[i].ChildNodes[j].ChildNodes.Count == 3 || busTable[i].ChildNodes[j].ChildNodes.Count == 2) && !busTable[i].ChildNodes[j].InnerHtml.Contains("href="))
+                            {
+                                busNumbers.Add(busTable[i].ChildNodes[j].InnerHtml.Replace("\r", "").Replace("\n", "").Replace("<strong>", "").Replace("</strong>", "").Trim());
+                                //System.Diagnostics.Debug.WriteLine(busTable[i].ChildNodes[j].InnerHtml);
+                            }
+                        }
+                        else if (busTable[i].ChildNodes[j].GetAttributeValue("style", "Test") == "width: 338px")
+                        {
+                            if (busTable[i].ChildNodes[j].ChildNodes[0].InnerHtml.Replace("&nbsp;", "").Trim() != "Route Name")
+                            {
+                                busNames.Add(busTable[i].ChildNodes[j].ChildNodes[0].InnerHtml.Replace("&nbsp;", "").Replace("&eacute;", "é")
+                                                                                                                    .Replace("&Eacute;", "É")
+                                                                                                                    .Replace("&egrave;", "è")
+                                                                                                                    .Replace("&Egrave;", "È")
+                                                                                                                    .Replace("&ocirc;", "ô")
+                                                                                                                    .Replace("&Ocirc;", "Ô")
+                                                                                                                    .Replace("&aacute;", "á")
+                                                                                                                    .Replace("&Aacute;", "Á")
+                                                                                                                    .Replace("&agrave;", "à")
+                                                                                                                    .Replace("&Agrave;", "À")
+                                                                                                                    .Replace("&acirc;", "â")
+                                                                                                                    .Replace("&Acirc;", "Â")
+                                                                                                                    .Replace("&ccedil;", "ç")
+                                                                                                                    .Replace("&ccedil;", "Ç").Trim());
+                            }
+                            //System.Diagnostics.Debug.WriteLine((busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml).Replace("&nbsp;", "").Trim());
+                        }
+                    }
+
+
+                    foreach (HtmlNode HN in busTable[i].ChildNodes[j].ChildNodes)
+                    {
+                        if (HN.GetAttributeValue("class", "Test") == "style4")
+                        {
+                            busNumbers.Add(busTable[i].ChildNodes[j].InnerHtml.Replace("\r", "").Replace("\n", "").Replace("<!--DEUXIEME COLONNE-->", "").Replace("<span class=\"style4\">", "").Replace("</span>", "").Trim());
+                            //System.Diagnostics.Debug.WriteLine(HN.InnerHtml);
+                        }
+                    }
+                }
+            }
+
+
+            if (busNumbers.Count == busNames.Count)
+            {
+                for (int i = 0; i < busNumbers.Count; i++)
+                {
+                    expressNetwork.Add(new Bus(busNumbers[i], busNames[i]));
+                }
+            }
+            //foreach (Bus b in expressNetwork)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("Bus Number: " + b.getBusNumber() + ", Bus Name: " + b.getBusName());
+            //}
+
+            string shuttle = "http://www.stm.info/english/bus/a-lig_navettes.htm";
+            HtmlWeb.LoadAsync(shuttle, ShuttleLinesLoaded);
+
+            //DisplayBusData();
+
+            //System.Diagnostics.Debug.WriteLine("i: " + i + " j: " + j + " Has Attribute: " + busTable[i].ChildNodes[j].HasAttributes + " InnerHTML: " + busTable[i].InnerHtml);
+            //.GetAttributeValue("style", false)
+            //System.Diagnostics.Debug.WriteLine(String.Join(Environment.NewLine, nodes[1].ChildNodes[16].ChildNodes
+            //                                                .Select(x => x.InnerHtml)
+            //                                                .ToList()));
+        }
+
+        private void ShuttleLinesLoaded(object sender, HtmlDocumentLoadCompleted args)
+        {
+            var nodes = args.Document.DocumentNode.SelectNodes("//table");
+
+            HtmlNodeCollection busTable = new HtmlNodeCollection(null);
+            busTable = nodes[1].ChildNodes;
+
+
+            System.Diagnostics.Debug.WriteLine("Shuttle: " + String.Join(Environment.NewLine, nodes[1].ChildNodes.Count));
+
+
+            List<string> busNumbers = new List<string>();
+            List<string> busNames = new List<string>();
+
+            for (int i = 0; i < busTable.Count; i++)
+            {
+                for (int j = 0; j < busTable[i].ChildNodes.Count; j++)
+                {
+                    if (busTable[i].ChildNodes[j].HasAttributes)
+                    {
+
+                        if (busTable[i].ChildNodes[j].GetAttributeValue("class", "Test") == "style20" || busTable[i].ChildNodes[j].GetAttributeValue("class", "Test") == "style23")
+                        {
+                            if (busTable[i].ChildNodes[j].ChildNodes.Count == 1)
+                            {
+                                busNumbers.Add(busTable[i].ChildNodes[j].InnerHtml.Replace("\r", "").Replace("\n", "").Trim());
+                                //System.Diagnostics.Debug.WriteLine(busTable[i].ChildNodes[j].InnerHtml);
+                            }
+                        }
+                        else if (busTable[i].ChildNodes[j].GetAttributeValue("style", "Test") == "width: 296px")
+                        {
+                            if (busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml.Replace("&nbsp;", "").Trim() != "Route Name")
+                                busNames.Add(busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml.Replace("&nbsp;", "").Replace("&eacute;", "é")
+                                                                                                                    .Replace("&Eacute;", "É")
+                                                                                                                    .Replace("&egrave;", "è")
+                                                                                                                    .Replace("&Egrave;", "È")
+                                                                                                                    .Replace("&ocirc;", "ô")
+                                                                                                                    .Replace("&Ocirc;", "Ô")
+                                                                                                                    .Replace("&aacute;", "á")
+                                                                                                                    .Replace("&Aacute;", "Á")
+                                                                                                                    .Replace("&agrave;", "à")
+                                                                                                                    .Replace("&Agrave;", "À")
+                                                                                                                    .Replace("&acirc;", "â")
+                                                                                                                    .Replace("&Acirc;", "Â")
+                                                                                                                    .Replace("&ccedil;", "ç")
+                                                                                                                    .Replace("&ccedil;", "Ç").Trim());
+                            //System.Diagnostics.Debug.WriteLine((busTable[i].ChildNodes[j].ChildNodes[1].InnerHtml).Replace("&nbsp;", "").Trim());
+                        }
+                    }
+                }
+            }
+
+            if (busNumbers.Count == busNames.Count)
+            {
+                for (int i = 0; i < busNumbers.Count; i++)
+                {
+                    shuttleNetwork.Add(new Bus(busNumbers[i], busNames[i]));
+                }
+            }
+            //foreach (Bus b in expressNetwork)
+            //{
+            //    System.Diagnostics.Debug.WriteLine("Bus Number: " + b.getBusNumber() + ", Bus Name: " + b.getBusName());
+            //}
+
+
+
+            DisplayBusData();
+
+
+            //System.Diagnostics.Debug.WriteLine("i: " + i + " j: " + j + " Has Attribute: " + busTable[i].ChildNodes[j].HasAttributes + " InnerHTML: " + busTable[i].InnerHtml);
+            //.GetAttributeValue("style", false)
+            //System.Diagnostics.Debug.WriteLine(String.Join(Environment.NewLine, nodes[1].ChildNodes[16].ChildNodes
+            //                                                .Select(x => x.InnerHtml)
+            //                                                .ToList()));
+        }
+
+        private void DisplayBusData()
+        {
+            BusListBox.Items.Clear();
+            foreach (Bus b in localNetwork)
+            {
+                Grid BusContainer = new Grid();
+                BusContainer.Width = 460;
+
+                TextBlock BusLine = new TextBlock();
+                BusLine.Text = b.getBusNumber();
+                BusLine.Height = 70;
+                BusLine.HorizontalAlignment = HorizontalAlignment.Left;
+                BusLine.VerticalAlignment = VerticalAlignment.Top;
+                BusLine.FontSize = 48;
+                BusLine.Margin = new Thickness(13, 0, 0, 0);
+                BusLine.Style = (Style)Application.Current.Resources["PhoneTextSubtleStyle"];
+
+                TextBlock BusName = new TextBlock();
+                BusName.Text = b.getBusName();
+                BusName.HorizontalAlignment = HorizontalAlignment.Left;
+                BusName.VerticalAlignment = VerticalAlignment.Top;
+                BusName.Margin = new Thickness(100, 10, 0, 0);
+                BusName.TextWrapping = TextWrapping.Wrap;
+                BusName.Style = (Style)Application.Current.Resources["PhoneTextLargeStyle"];
+
+                BusContainer.Children.Add(BusLine);
+                BusContainer.Children.Add(BusName);
+
+                BusListBox.Items.Add(BusContainer);
+            }
+
+            foreach (Bus b in allNightNetwork)
+            {
+                Grid BusContainer = new Grid();
+
+                TextBlock BusLine = new TextBlock();
+                BusLine.Text = b.getBusNumber();
+                BusLine.Height = 70;
+                BusLine.HorizontalAlignment = HorizontalAlignment.Left;
+                BusLine.VerticalAlignment = VerticalAlignment.Top;
+                BusLine.FontSize = 48;
+                BusLine.Margin = new Thickness(13, 0, 0, 0);
+                BusLine.Style = (Style)Application.Current.Resources["PhoneTextSubtleStyle"];
+
+                TextBlock BusName = new TextBlock();
+                BusName.Text = b.getBusName();
+                BusName.HorizontalAlignment = HorizontalAlignment.Left;
+                BusName.VerticalAlignment = VerticalAlignment.Top;
+                BusName.Margin = new Thickness(100, 10, 0, 0);
+                BusName.TextWrapping = TextWrapping.Wrap;
+                BusName.Style = (Style)Application.Current.Resources["PhoneTextLargeStyle"];
+
+                BusContainer.Children.Add(BusLine);
+                BusContainer.Children.Add(BusName);
+
+                BusListBox.Items.Add(BusContainer);
+            }
+
+            foreach (Bus b in expressNetwork)
+            {
+                Grid BusContainer = new Grid();
+
+                TextBlock BusLine = new TextBlock();
+                BusLine.Text = b.getBusNumber();
+                BusLine.Height = 70;
+                BusLine.HorizontalAlignment = HorizontalAlignment.Left;
+                BusLine.VerticalAlignment = VerticalAlignment.Top;
+                BusLine.FontSize = 48;
+                BusLine.Margin = new Thickness(13, 0, 0, 0);
+                BusLine.Style = (Style)Application.Current.Resources["PhoneTextSubtleStyle"];
+
+                TextBlock BusName = new TextBlock();
+                BusName.Text = b.getBusName();
+                BusName.HorizontalAlignment = HorizontalAlignment.Left;
+                BusName.VerticalAlignment = VerticalAlignment.Top;
+                BusName.Margin = new Thickness(100, 10, 0, 0);
+                BusName.TextWrapping = TextWrapping.Wrap;
+                BusName.Style = (Style)Application.Current.Resources["PhoneTextLargeStyle"];
+
+                BusContainer.Children.Add(BusLine);
+                BusContainer.Children.Add(BusName);
+
+                BusListBox.Items.Add(BusContainer);
+            }
+
+            foreach (Bus b in shuttleNetwork)
+            {
+                Grid BusContainer = new Grid();
+
+                TextBlock BusLine = new TextBlock();
+                BusLine.Text = b.getBusNumber();
+                BusLine.Height = 70;
+                BusLine.HorizontalAlignment = HorizontalAlignment.Left;
+                BusLine.VerticalAlignment = VerticalAlignment.Top;
+                BusLine.FontSize = 48;
+                BusLine.Margin = new Thickness(13, 0, 0, 0);
+                BusLine.Style = (Style)Application.Current.Resources["PhoneTextSubtleStyle"];
+
+                TextBlock BusName = new TextBlock();
+                BusName.Text = b.getBusName();
+                BusName.HorizontalAlignment = HorizontalAlignment.Left;
+                BusName.VerticalAlignment = VerticalAlignment.Top;
+                BusName.Margin = new Thickness(100, 10, 0, 0);
+                BusName.TextWrapping = TextWrapping.Wrap;
+                BusName.Style = (Style)Application.Current.Resources["PhoneTextLargeStyle"];
+
+                BusContainer.Children.Add(BusLine);
+                BusContainer.Children.Add(BusName);
+
+                BusListBox.Items.Add(BusContainer);
+            }
 
         }
     }
