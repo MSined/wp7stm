@@ -8,26 +8,26 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
-    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800" 
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768" 
     d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="False" xmlns:my="clr-namespace:Microsoft.Advertising.Mobile.UI;assembly=Microsoft.Advertising.Mobile.UI">
+    shell:SystemTray.IsVisible="True" xmlns:my="clr-namespace:Microsoft.Advertising.Mobile.UI;assembly=Microsoft.Advertising.Mobile.UI">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="Transparent" Loaded="LayoutRoot_Loaded">
  
         <!--Panorama control-->
-        <controls:Panorama Title="Transit MTL" Name="PanoramaLayout" TitleTemplate="{StaticResource SmallerPanoramaTitle}">
+        <controls:Panorama Title="STM TransitMTL" Name="PanoramaLayout" TitleTemplate="{StaticResource SmallerPanoramaTitle}">
             <controls:Panorama.Background>
                 <ImageBrush ImageSource="PanoramaBackground.png"/>
             </controls:Panorama.Background>
  
             <!--Panorama item one-->
             <!--Use 'Orientation="Horizontal"' to enable a panel that lays out horizontally-->
-            <controls:PanoramaItem Header="Bus">
+            <controls:PanoramaItem Name="BusPano" Header="Bus">
                 <ListBox HorizontalAlignment="Left" Margin="0,0,0,0" Name="BusListBox" VerticalAlignment="Top">
                 <!--Double line list with image placeholder and text wrapping-->
                 <!--<ListBox Margin="0,0,-12,0" ItemsSource="{Binding Items}">
@@ -41,7 +41,7 @@
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>-->
-                    <!--<Grid Name="BusListGrid" >
+                    <!--<Grid Name="BusListGrid" Tap="BusListGrid_Tap">
                         <TextBlock Height="70" HorizontalAlignment="Left" Margin="13,0,0,0" Name="textBlock17" Text="128" VerticalAlignment="Top" Width="73" FontWeight="Normal" FontSize="48" Style="{StaticResource PhoneTextSubtleStyle}"/>
                         <TextBlock HorizontalAlignment="Left" Margin="100,10,0,0" Name="textBlock3" Text="South" VerticalAlignment="Top" Style="{StaticResource PhoneTextLargeStyle}"/>
                     </Grid>-->
@@ -49,11 +49,11 @@
             </controls:PanoramaItem>
 
             <!--Panorama item two-->
-            <controls:PanoramaItem Header="Stop Code">
+            <controls:PanoramaItem Name="StopCode">
                 <!--Double line list with text wrapping-->
                 <Grid Name="StopCodeGrid">
-                    <TextBox Height="72" HorizontalAlignment="Left" Name="StopCodeTextBox" Text="Enter Bus Code Here" VerticalAlignment="Top" GotFocus="StopCodeTextBox_OnFocus" InputScope="Digits" Width="400"></TextBox>
-                    <Button Content="Search" Height="72" HorizontalAlignment="Left" Name="Search" VerticalAlignment="Top" Width="160" Click="Search_Click" Margin="0,60,0,0" />
+                    <TextBox Height="72" HorizontalAlignment="Left" Name="StopCodeTextBox" VerticalAlignment="Top" GotFocus="StopCodeTextBox_OnFocus" InputScope="Digits" Width="400"></TextBox>
+                    <Button Height="72" HorizontalAlignment="Left" Name="Search" VerticalAlignment="Top" Click="Search_Click" Margin="0,60,0,0" />
                     <ListBox Height="462" Margin="0,129,0,0" Name="ResultsList" SelectionChanged="ResultsList_SelectionChanged">
                         <!--<Grid Name="ResultsListItem" >
                             <TextBlock Height="70" HorizontalAlignment="Left" Margin="13,0,0,0" Name="textBlock17" Text="128" VerticalAlignment="Top" Width="73" FontWeight="Normal" FontSize="48" />
@@ -66,12 +66,12 @@
                 </Grid>
             </controls:PanoramaItem>
 
-            <controls:PanoramaItem Header="Favorites">
+            <controls:PanoramaItem Name="Favorites">
                 <!--Double line list with text wrapping-->
                 <Grid Name="FavoritesGrid">
                     <ListBox Name="FavoritesList" SelectionChanged="FavoritesList_SelectionChanged">
                         <TextBlock HorizontalAlignment="Left" Name="textBlock1" VerticalAlignment="Top" TextWrapping="Wrap">
-                            To add a stop to favorites enter the Bus Stop Code of your choice in the "Stop Code" Section and Long Press (Press and Hold) a bus line to save to Favorites. Long Press a favorite to remove it.
+                            
                         </TextBlock>
                     </ListBox>
                 </Grid>
